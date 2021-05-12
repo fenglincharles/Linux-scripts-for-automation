@@ -1,0 +1,33 @@
+#!/bin/sh
+#trap "" 1 2 3
+########################################################
+#			4-step device tracker version:0
+#Description:
+#			This script helps user to detect the existance
+#			of 4-step device in Client's STATUS files
+#Create file:
+#			four_step_devices.txt
+#			
+#Create on/by: 20160613/CL
+########################################################
+#. /users/acs/.profile > /dev/null 2>&1
+
+cd ~/DB/STATUS
+echo "START serching the 4 steps devices recorded in STATUS files" > four_step_devices.txt
+chmod 775 four_step_devices.txt
+ls |grep ^STSR|grep DEF$ |
+while read -r line
+do
+	undbc -o $line
+	line_name=$(echo $line|awk 'BEGIN{FS="."}{print $1}')
+	echo $line_name >> tmp.txt 
+	cat $line_name.TXT |egrep 'NO\.|linked_next'|sed 'N;s/\n/\t/'|grep '= 1' >> tmp.txt
+#sed 'N;s/\n/\n/'  => combine two lines
+#sed ':a;.....;ba' => :a -> label for command b (jumper) => redo 'N;s/\n/\n/' again and again til end
+	#cat tmp.txt |sed ':a;N;s/\n/\n/;ba' >> four_step_devices.txt
+	cat tmp.txt |sed 'N;s/\n/\n/' >> four_step_devices.txt
+	rm tmp.txt
+	rm $line_name.TXT
+done
+
+

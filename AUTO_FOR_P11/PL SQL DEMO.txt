@@ -1,0 +1,120 @@
+
+-## print jackson is ....
+
+set serveroutput on
+
+declare 
+A VARCHAR2(50);
+C VARCHAR2(50);
+
+BEGIN
+   A :='select name from B where idx =1 ';
+  EXECUTE IMMEDIATE A into C;
+   DBMS_OUTPUT.PUT_LINE(chr(10));
+   DBMS_OUTPUT.PUT_LINE('JACKSON is the '||C);
+END;
+/
+
+-##
+set serveroutput on
+
+declare 
+B VARCHAR2(20);
+
+BEGIN
+  
+  EXECUTE IMMEDIATE 'select name from B where idx = 2' into B;
+   DBMS_OUTPUT.PUT_LINE(chr(17)||chr(17)||chr(17)||chr(17)||chr(17)||' DAVID is the '||B||chr(16)||chr(16)||chr(16)||chr(16)||chr(16));
+   
+END;
+/
+
+-##
+
+SET SERVEROUT ON
+DECLARE
+	stmt VARCHAR2(2000);
+	name2 varchar2(29);
+
+
+
+CURSOR jackson is SELECT name FROM breaker where SWTYPE = 'SW2'  ;	   
+	
+BEGIN
+
+OPEN jackson;
+      LOOP
+	  FETCH jackson INTO name2;
+		IF jackson%NOTFOUND then
+			EXIT;
+		end if;
+		 stmt :='insert into BBB (fsc,name,ufid,rownu) select fsc,name,ufid,rownum from view_electric_conn where name = name2;';
+		EXECUTE IMMEDIATE stmt using name2;
+		commit;
+               
+                 
+	  end loop;
+	
+
+
+END;
+/
+
+--#####
+
+SET SERVEROUT ON
+DECLARE
+	stmt VARCHAR2(2000);
+	name2 varchar2(29);
+
+
+
+CURSOR iamjackson is SELECT name FROM breaker where SWTYPE = 'SW2'  ;	   
+	
+BEGIN
+
+OPEN iamjackson;
+      LOOP
+	  FETCH iamjackson INTO name2;
+		IF iamjackson%NOTFOUND then
+			EXIT;
+		end if;
+		 stmt :='insert into BBB (fsc,name,ufid,rownu) select fsc,name,ufid,rownum from view_electric_conn where name = :Z';
+		EXECUTE IMMEDIATE stmt using name2;
+		commit;
+         stmt :='update BBB set name = (select phase from view_electric_conn where name = :a) ';
+        EXECUTE IMMEDIATE stmt using name2;
+        commit;
+	  end loop;
+	
+
+
+END;
+/
+
+
+
+
+
+
+
+
+
+
+
+
+
+DBMS_OUTPUT.PUT_LINE(chr(4)  ||chr(4)||chr(4)||chr(4)||chr(4)||chr(4)||chr(4)||chr(4)||chr(4)||chr(4)||chr(4)||chr(4)||chr(4)||chr(4)||chr(4)||chr(4)||chr(4)||chr(4)||chr(4)||chr(4)||chr(4)||chr(4)||chr(4)||chr(4)||chr(4)||chr(4)||chr(4));
+   DBMS_OUTPUT.PUT_LINE(chr(5)  ||chr(5)||chr(5)||chr(5)||chr(5)||chr(5)||chr(5)||chr(5)||chr(5)||chr(5)||chr(5)||chr(5)||chr(5)||chr(5)||chr(5)||chr(5)||chr(5)||chr(5)||chr(5)||chr(5)||chr(5)||chr(5)||chr(5)||chr(5)||chr(5)||chr(5)||chr(5));
+   DBMS_OUTPUT.PUT_LINE(chr(6)  ||chr(6)||chr(6)||chr(6)||chr(6)||chr(6)||chr(6)||chr(6)||chr(6)||chr(6)||chr(6)||chr(6)||chr(6)||chr(6)||chr(6)||chr(6)||chr(6)||chr(6)||chr(6)||chr(6)||chr(6)||chr(6)||chr(6)||chr(6)||chr(6)||chr(6)||chr(6));
+DBMS_OUTPUT.PUT_LINE(chr(1)  ||chr(1)||chr(1)||chr(1)||chr(1)||chr(1)||chr(1)||chr(1)||chr(1)||chr(1)||chr(1)||chr(1)||chr(1)||chr(1)||chr(1)||chr(1)||chr(1)||chr(1)||chr(1)||chr(1)||chr(1)||chr(1)||chr(1)||chr(1)||chr(1)||chr(1)||chr(1));
+   DBMS_OUTPUT.PUT_LINE(chr(2)  ||chr(2)||chr(2)||chr(2)||chr(2)||chr(2)||chr(2)||chr(2)||chr(2)||chr(2)||chr(2)||chr(2)||chr(2)||chr(2)||chr(2)||chr(2)||chr(2)||chr(2)||chr(2)||chr(2)||chr(2)||chr(2)||chr(2)||chr(2)||chr(2)||chr(2)||chr(2));
+   DBMS_OUTPUT.PUT_LINE(chr(3)  ||chr(3)||chr(3)||chr(3)||chr(3)||chr(3)||chr(3)||chr(3)||chr(3)||chr(3)||chr(3)||chr(3)||chr(3)||chr(3)||chr(3)||chr(3)||chr(3)||chr(3)||chr(3)||chr(3)||chr(3)||chr(3)||chr(3)||chr(3)||chr(3)||chr(3)||chr(3));
+chr(10) ´«¦æ
+
+
+ 
+
+
+
+

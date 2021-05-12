@@ -1,0 +1,99 @@
+#!/bin/sh
+#trap "" 1 2 3
+########################################################
+#			4-step device tracker version:0
+#Description:
+#			This script helps user to detect the existance
+#			of 4-step device in Client's STATUS files
+#Create file:
+#			four_step_devices.txt
+#			osi_devices.txt
+#			
+#Create on/by: 20160613/CL
+#for NEMO 20170220
+########################################################
+#. /users/acs/.profile > /dev/null 2>&1
+
+cd ~/DB/STATUS
+rm four_step_devices.txt
+rm osi_devices.txt
+#echo "START serching the 4 steps devices recorded in STATUS files" > four_step_devices.txt
+touch four_step_devices.txt
+
+chmod 775 four_step_devices.txt
+ls |grep ^STSR|grep DEF$ |
+while read -r line
+do
+
+	line_num=$(echo $line|awk 'BEGIN{FS="."}{print $1}'|  sed -e 's/STSR//g')
+if [ $line_num -lt 501 ]; then
+
+	undbc -o $line
+	line_name=$(echo $line|awk 'BEGIN{FS="."}{print $1}')
+#	echo $line_name >> tmp.txt 
+		
+#cat $line_name.TXT |egrep 'point_description|linked_next'|sed 'N;s/\n/\t/'|grep '= 1' >> tmp.txt
+	#cat $line_name.TXT |egrep 'NO\.|status_pair_code'|sed 'N;s/\n/\t/' |grep -v '= 0'>> tmp.txt
+	
+	cat $line_name.TXT |egrep 'NO\.|open_state_indicator'| sed  'N;s/\n/ /' >> tmp_osi.txt ; sed -i 's/ /-/g' tmp_osi.txt
+	for i in `cat tmp_osi.txt`
+	do
+	line_num_no0=$(echo $line_num |awk '{printf "%.0f",$line_num}')
+	k=$(echo $i |sed -e 's/#-REC.-NO.://g'|sed -e 's/--open_state_indicator-=-1-//g')
+	echo $line_num_no0 R $k >>tmp_osi_2.txt
+	done
+
+	cat $line_name.TXT |egrep 'NO\.|linked_next'|sed  'N;s/\n/ /' |grep '= 1' >>  tmp00.txt
+	sed -i 's/ /-/g' tmp00.txt	
+	for i in `cat tmp00.txt`
+	do
+	echo $i	
+	line_num_no0=$(echo $line_num |awk '{printf "%.0f",$line_num}')
+	j=$(echo $i |sed -e 's/#-REC.-NO.://g'|sed -e 's/--linked_next-=-1-//g')
+echo $line_num_no0 R $j >> tmp.txt
+
+	done	
+
+#sed 'N;s/\n/\n/'  => combine two lines
+#sed ':a;.....;ba' => :a -> label for command b (jumper) => redo 'N;s/\n/\n/' again and again til end
+##	cat tmp.txt |sed ':a;N;s/\n/\t/;ba' >> four_step_devices.txt
+	cat tmp.txt >> four_step_devices.txt
+	cat tmp_osi_2.txt |grep -v open_state_indicator >> osi_devices.txt
+	rm tmp_osi_2.txt
+	rm tmp.txt
+	rm tmp00.txt
+	rm tmp_osi.txt
+	rm $line_name.TXT
+fi
+done
+
+
+#####SQL
+rm four_step_devices.sql osi_devices.sql
+echo "drop table das_4step_check;">four_step_devices.sql
+echo "drop table das_osi_check;">osi_devices.sql
+
+echo "create table das_4step_check as select station,category,point from das_rtdb where station=-999;">>four_step_devices.sql
+echo "create table das_osi_check as select station,category,point from das_rtdb where station=-999;">>osi_devices.sql
+#osi
+cat osi_devices.txt |while read -r line
+do
+echo $line |awk -v q="'" '{print "insert into das_osi_check(station,category,point) values ("q$1q","q$2q","q$3q");"}' >>osi_devices.sql
+done
+echo commit";" >>osi_devices.sql
+echo exit";" >>osi_devices.sql
+cat four_step_devices.txt |while read -r line
+do
+echo $line |awk -v q="'" '{print "insert into das_4step_check(station,category,point) values ("q$1q","q$2q","q$3q");"}' >>four_step_devices.sql
+done
+
+echo commit";" >>four_step_devices.sql
+echo exit";" >>four_step_devices.sql
+sqlplus $ORACLE_USER_BASEDB/$ORACLE_PW@$ORACLE_DBSTRING_BASEDB @osi_devices.sql
+sqlplus $ORACLE_USER_BASEDB/$ORACLE_PW@$ORACLE_DBSTRING_BASEDB @four_step_devices.sql
+
+
+echo "finish insserin das_osi_check,das_4step_check"
+
+
+

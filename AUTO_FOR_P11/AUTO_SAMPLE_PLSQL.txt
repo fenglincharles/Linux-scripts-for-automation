@@ -1,0 +1,47 @@
+
+
+
+
+
+
+PROCEDURE PROC_SELECT(tableName in varchar2, CurDropTbName OUT NOCOPY sys_refcursor) 
+is
+	declare 
+	cursor EQUIP_NUM is select name from tableName;
+	open equip_num
+	loop
+			FETCH equip_num INTO equip_num_insert;
+			if equip_num%NOTFOUND then
+				exit;
+			else
+				PROC_INSERT(equip_num_insert,cur)
+				commit;	
+	end LOOP
+	
+PROC_INSERT(CS)
+PROC_INSERT(CV)
+end PROC_SELECT
+PROCEDURE PROC_INSERT(COLNAME_ARRAY_CS)
+is
+end
+PROCEDURE PROC_INSERT(COLNAME_ARRAY_CV)
+is
+end
+
+
+BEGIN
+TABLNAME_ARRAY := ('BREAKER','GIS_BREAKER')
+COLNAME_ARRAY_CS := ('STATUS','LOCREMFLAG')
+COLNAME_ARRAY_CV := ('STATUS','LOCREMFLAG')
+FLAGNAME_ARRAY := ('FDIRFLAG')
+
+total := TABLNAME_ARRAY.count
+			FOR i in 1 .. total LOOP
+				dbms_output.put_line('=== Processing ' || TABLNAME_ARRAY(i) || ' table... ===');
+				PROC_SELECT(TABLNAME_ARRAY(i),cur);
+			END LOOP;
+total2 := FLAGNAME_ARRAY.count
+			FOR i in 1 .. total LOOP
+				dbms_output.put_line('=== Processing ' || FLAGNAME_ARRAY(i) || ' table... ===');
+				PROC_SELECT(FLAGNAME_ARRAY(i),cur);
+			END LOOP;
